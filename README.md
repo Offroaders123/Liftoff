@@ -51,7 +51,7 @@ HoldYourWaffle made this nice connection also:
 This continued to further discussion and distinctions:
 
 <details>
-  <summary>Silent Performance Concerns</summary>
+  <summary>Silent Performance Concerns (Extended commentary)</summary>
 
   > **HoldYourWaffle** -
   > That'd be a boilerplate nightmare though.
@@ -102,3 +102,74 @@ This continued to further discussion and distinctions:
   > `await` ensures you know what you are calling when you call it, while the other just doesn't become apparent.
 
 </details>
+
+> One could argue this setup isn't worthwhile because you could leak things unintentionally.
+> But that's the same now as just doing something like this:
+> ```js
+> async function hi(){
+>   // oops, forgot `await`
+>   new Promise(resolve => setTimeout(resolve,2500));
+> }
+> 
+> hi().then(() => console.log("done!")); // this is inaccurate because the async job goes off into the abyss
+> ```
+
+Another case I thought that would need handling for this keyword idea, are non-async implementations.
+
+![Unnecessary Await](./img/unnecessary-await.png)
+
+If you try using `liftoff` on non-`async` (More specifically, `Promise`) results, what should it do?
+
+Considering the fact that `async` functions implicitly wrap their return values with `Promise`s, I'm initially thinking that `liftoff` should do the same.
+
+> Say if you were to try and do:
+> ```js
+> const hi = liftoff console.log("heya");
+> ```
+> Should `hi` be `void`, or `Promise<void>`?
+> With the case of `liftoff`, I think `Promise<void>`, and that it would have the same kind of error in a TypeScript setting:
+> ```
+> 'liftoff' has no effect on the type of this expression.
+> ```
+
+And in concept with the concern with calling just *any* function with `liftoff`, the `async` modifier (or maybe a different name would make sense, like `plane`, hehe) could instead be used to define whether a function could be made quicker when used asynchronously.
+
+> You could mark your functions as `async` still, but it won't effect how methods are called inside of it, rather it would be for marking whether it's calls can be `liftoff`-ed.
+> So `readFile()` would be `async function readFile(path: string): Buffer` essentially, and the `async` part marks whether it can be used with `liftoff` and have any different execution times to that of just the plain sync calling of it.
+
+Honestly I'm not completely sure about the handling of this at the moment, this is where this stage of the concept is breaking it down from being a valid idea. I think the issue is that this makes all synchronous code essentially just `await`ed `Promise`s, which would dramatically slow everything down, because everything would have to be `Promise`s under the hood.
+
+> **HoldYourWaffle** -
+> How can it have different execution times depending on how you call it?
+> 
+> **Offroaders123** -
+> Because the implementation of Node's `readFile()` inherently takes time, it's just whether or not it should pause the main thread or not.
+> And continuing down that route, any function call takes time to execute, but it can't just be made `async` by adding `async` to it, that's not going to make it any faster.
+> But hmm, I wonder if that could actually be implemented if you were to use this syntax.
+> `Math.random()` isn't any less blocking inside of `Promise.resolve(Math.random)`, for example.
+> 
+> **HoldYourWaffle** -
+> Yeah exactly, that's sort of my point.
+> 
+> **Offroaders123** -
+> But say if `Math.random()` were heavy, you could move that to a thread and then use that with `liftoff`/`Promise.resolve()`, that could have potential at being faster.
+
+We then went on to cover this demo, for brevity in which both functions are `Promise` returning `async` functions (the numbers are for the calls themselves, not for their resolution order):
+
+```ts
+foo();         // 1
+liftoff foo(); // 2
+bar();         // 3
+liftoff bar(); // 4
+```
+
+This is the equivalent set of functions in a standard async-await scenario:
+
+```js
+await foo(); // 1
+foo();       // 2
+await bar(); // 3
+bar();       // 4
+```
+
+![Liftoff Async Demo](./img/liftoff-async.png)
