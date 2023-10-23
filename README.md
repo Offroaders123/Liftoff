@@ -50,51 +50,55 @@ HoldYourWaffle made this nice connection also:
 
 This continued to further discussion and distinctions:
 
-> **HoldYourWaffle** -
-> That'd be a boilerplate nightmare though.
-> Async functions have to be designed to be async, so it makes sense that they're inherently async at declaration.
-> You generally can't "asyncify" a random sync function.
-> 
-> **Offroaders123** -
-> If the implementer doesn't want to block their usecase of the heavy task, they would handle the use of `liftoff`.
-> 
-> **HoldYourWaffle** -
-> For async functions that's the default now, as it should be.
-> Adding `liftoff` would just add boilerplate that could be forgotten.
-> 
-> **Offroaders123** -
-> That's no different than forgetting `await` though.
-> 
-> **HoldYourWaffle** -
-> I can see some value in syntax sugar for "fire and forget" function calls, but those are rare.
-> The current boilerplate isn't too horrifying for those cases.
-> 
-> **HoldYourWaffle** -
-> Forgetting `await` explicitly makes things not work.
-> Forgetting `liftoff` would silently introduce performance problems.
-> Wait wait wait wait,
-> No hang on.
-> That doesn't make sense.
-> Are you saying `liftoff` is the equivalent of `await new Thread(...).start()`?
-> As in, execute in a different thread,
-> then wait for the result?
-> 
-> **Offroaders123** -
-> No `liftoff` is the behavior of not adding `await`.
-> 
-> **HoldYourWaffle** -
-> So a fire and forget call?
-> 
-> **Offroaders123** -
-> Yeah.
-> 
-> **HoldYourWaffle** -
-> That's completely different from forgetting `await`.
-> Forgetting `await` is "I can't use the result yet".
-> Forgetting `liftoff` is "I'm silently blocking the main thread even though I don't care about the result of this thing".
-> I could see some value in syntax sugar for "fire and forget", but the applications would be minimal.
-> 
-> **Offroaders123** -
-> So I think this is likely the tradeoff between the two (*In reference to HoldYourWaffle's message above*).
-> `await` ensures you know what you are calling when you call it, while the other just doesn't become apparent.
+<details>
+  <summary>Silent Performance Concerns</summary>
 
+  > **HoldYourWaffle** -
+  > That'd be a boilerplate nightmare though.
+  > Async functions have to be designed to be async, so it makes sense that they're inherently async at declaration.
+  > You generally can't "asyncify" a random sync function.
+  > 
+  > **Offroaders123** -
+  > If the implementer doesn't want to block their usecase of the heavy task, they would handle the use of `liftoff`.
+  > 
+  > **HoldYourWaffle** -
+  > For async functions that's the default now, as it should be.
+  > Adding `liftoff` would just add boilerplate that could be forgotten.
+  > 
+  > **Offroaders123** -
+  > That's no different than forgetting `await` though.
+  > 
+  > **HoldYourWaffle** -
+  > I can see some value in syntax sugar for "fire and forget" function calls, but those are rare.
+  > The current boilerplate isn't too horrifying for those cases.
+  > 
+  > **HoldYourWaffle** -
+  > Forgetting `await` explicitly makes things not work.
+  > Forgetting `liftoff` would silently introduce performance problems.
+  > Wait wait wait wait,
+  > No hang on.
+  > That doesn't make sense.
+  > Are you saying `liftoff` is the equivalent of `await new Thread(...).start()`?
+  > As in, execute in a different thread,
+  > then wait for the result?
+  > 
+  > **Offroaders123** -
+  > No `liftoff` is the behavior of not adding `await`.
+  > 
+  > **HoldYourWaffle** -
+  > So a fire and forget call?
+  > 
+  > **Offroaders123** -
+  > Yeah.
+  > 
+  > **HoldYourWaffle** -
+  > That's completely different from forgetting `await`.
+  > Forgetting `await` is "I can't use the result yet".
+  > Forgetting `liftoff` is "I'm silently blocking the main thread even though I don't care about the result of this thing".
+  > I could see some value in syntax sugar for "fire and forget", but the applications would be minimal.
+  > 
+  > **Offroaders123** -
+  > So I think this is likely the tradeoff between the two (*In reference to HoldYourWaffle's message above*).
+  > `await` ensures you know what you are calling when you call it, while the other just doesn't become apparent.
+
+</details>
