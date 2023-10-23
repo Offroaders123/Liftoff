@@ -1,0 +1,29 @@
+<script type="module">
+  const demo0 = (await fetch("./example.txt")).then(response => response.text());
+  console.log(demo0);
+
+  fetch("./example.txt").then(async response => {
+    const demo1 = await response.text();
+    console.log(demo1);
+  });
+</script>
+
+<script type="liftoff">
+  const demo0 = fetch("./example.txt").text();
+
+  liftoff fetch("./example.txt").then(response => {
+    const demo1 = response.text();
+    console.log(demo1);
+  });
+</script>
+
+<!-- This one was a one-off concept idea, not sure how I feel about it still -->
+<!-- The blocks will run at the same time the `Promise` will normally resolve, it's not synchronous to the main block -->
+<script type="liftoff-experimental-blocks">
+  liftoff (fetch("./example.txt")) {
+    then (response){
+      const demo3 = response.text();
+      console.log(demo3);
+    }
+  }
+</script>
